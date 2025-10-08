@@ -1,0 +1,11 @@
+# Dependency files
+node_modules
+npm-debug.log*
+
+# Build artifacts
+.next
+out
+
+# Configuration files
+.env
+.git

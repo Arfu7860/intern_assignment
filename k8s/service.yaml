@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextjs-app-service
+spec:
+  # Use NodePort for Minikube to easily expose the service externally
+  type: NodePort
+  selector:
+    app: nextjs-app
+  ports:
+    - protocol: TCP
+      port: 80       # Port on the Service
+      targetPort: 3000 # Port on the Pod/Container
+      # Minikube will assign a random high port for NodePort,
+      # which can be retrieved using 'minikube service nextjs-app-service'
