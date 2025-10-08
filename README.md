@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Structure
 
-## Getting Started
+Next.js Application Deployment with Docker, GitHub Actions, and Minikube
+This repository contains a containerized Next.js application, automated build/push via GitHub Actions to GHCR, and deployment manifests for Kubernetes (Minikube).
 
-First, run the development server:
+Prerequisites
+Git
 
-```bash
+Node.js (for local testing)
+
+Docker
+
+Minikube (and a hypervisor like VirtualBox or Docker Desktop)
+
+kubectl
+
+Local Setup Instructions
+Clone the repository:
+
+Bash
+
+git clone [YOUR_REPO_URL]
+cd [YOUR_REPO_NAME]
+Install dependencies:
+
+Bash
+
+npm install
+Local Run Commands
+1. Next.js Development Server
+Bash
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+# Access the app at http://localhost:3000
+2. Docker Build and Run
+Bash
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Build the image locally
+docker build -t nextjs-local:latest .
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Run the container
+docker run -d -p 3000:3000 --name nextjs-local-container nextjs-local:latest
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Access the app at http://localhost:3000
+docker logs nextjs-local-container
+GitHub Actions (CI/CD)
+The workflow defined in .github/workflows/docker-build-push.yaml automatically runs on every push to the main branch.
 
-## Learn More
+Action: Build the Docker image using a multi-stage build.
 
-To learn more about Next.js, take a look at the following resources:
+Registry: Push the built image to GitHub Container Registry (GHCR).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Tagging: Images are tagged with latest and a unique SHA (sha-<commit-sha>).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+GHCR Image URL: ghcr.io/your-github-username/my-next-app:latest (Replace with your actual URL)
 
-## Deploy on Vercel
+Deployment Steps for Minikube
+Start Minikube:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Bash
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+minikube start
+Apply Kubernetes Manifests:
+Navigate to the root of the repository and apply the files in the k8s/ folder.
+
+Bash
+
+kubectl apply -f k8s/
+# Expected output:
+# deployment.apps/nextjs-app-deployment created
+# service/nextjs-app-service created
+Verify Deployment:
+Check the status of the Deployment and Pods.
+
+Bash
+
+kubectl get deployments
+kubectl get pods
+How to Access the Deployed Application
+The application is exposed via a NodePort Service.
+
+Get the Service URL and Port:
+Use the Minikube command to automatically open the application in your browser or display the URL.
+
+Bash
+
+minikube service nextjs-app-service --url
+Access the Application:
+Navigate to the URL provided by the command above (e.g., http://192.168.49.2:32000).
